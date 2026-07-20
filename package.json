@@ -1,0 +1,22 @@
+{
+  "name": "app-dlanonna",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @dlanonna/core && npm run build -w @dlanonna/horarios && npm run build -w @dlanonna/server",
+    "dev": "tsx watch apps/server/src/index.ts",
+    "start": "node apps/server/dist/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "tsx": "^4.15.0",
+    "@types/node": "^20.14.0",
+    "@types/pg": "^8.11.6",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.6"
+  }
+}

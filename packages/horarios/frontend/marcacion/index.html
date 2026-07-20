@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Marcación - D'la Nonna</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      user-select: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #e94560;
+    }
+
+    .logo p {
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    .input-group {
+      margin-bottom: 10px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+
+    .cedula-display {
+      width: 100%;
+      padding: 12px;
+      font-size: 22px;
+      font-weight: 600;
+      text-align: center;
+      background: #16213e;
+      border: 2px solid #0f3460;
+      border-radius: 10px;
+      color: #fff;
+      letter-spacing: 4px;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .key {
+      padding: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      background: #16213e;
+      border: 2px solid #0f3460;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .key:active {
+      background: #0f3460;
+      transform: scale(0.95);
+    }
+
+    .key.action {
+      background: #0f3460;
+    }
+
+    .key.action:active {
+      background: #1a1a2e;
+    }
+
+    .btn-marcar {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: 700;
+      background: #e94560;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .btn-marcar:active {
+      transform: scale(0.98);
+      background: #c73650;
+    }
+
+    .btn-marcar:disabled {
+      background: #444;
+      cursor: not-allowed;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .btn-consultar {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: 600;
+      background: #0f3460;
+      border: 2px solid #1a4a8a;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .btn-consultar:active {
+      transform: scale(0.98);
+      background: #0a2647;
+    }
+
+    .btn-consultar:disabled {
+      background: #333;
+      border-color: #444;
+      cursor: not-allowed;
+    }
+
+    .consulta-panel {
+      display: none;
+      margin-top: 10px;
+      background: #16213e;
+      border: 2px solid #0f3460;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .consulta-panel.visible {
+      display: block;
+    }
+
+    .consulta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .consulta-titulo {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e94560;
+    }
+
+    .consulta-cerrar {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+
+    .consulta-cerrar:hover {
+      color: #fff;
+    }
+
+    .consulta-lista {
+      list-style: none;
+    }
+
+    .consulta-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #0f3460;
+    }
+
+    .consulta-item:last-child {
+      border-bottom: none;
+    }
+
+    .consulta-tipo {
+      font-weight: 600;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 5px;
+    }
+
+    .consulta-tipo.entrada {
+      background: #0a3d2a;
+      color: #27ae60;
+    }
+
+    .consulta-tipo.salida {
+      background: #3d1a0a;
+      color: #e67e22;
+    }
+
+    .consulta-hora {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .consulta-empty {
+      display: none;
+      text-align: center;
+      color: #888;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .consulta-empty.visible {
+      display: block;
+    }
+
+    .resultado {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    .resultado.exito {
+      background: #0a3d2a;
+      border: 2px solid #27ae60;
+      display: block;
+    }
+
+    .resultado.error {
+      background: #3d0a0a;
+      border: 2px solid #e74c3c;
+      display: block;
+    }
+
+    .resultado .icono {
+      font-size: 32px;
+      margin-bottom: 4px;
+    }
+
+    .resultado .mensaje {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .resultado .detalle {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 4px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid #333;
+      border-top-color: #e94560;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>D' la Nonna</h1>
+      <p>Control de Horarios</p>
+    </div>
+
+    <div class="input-group">
+      <label>Cédula</label>
+      <input type="text" class="cedula-display" id="cedula" readonly placeholder="Ingrese su cédula" maxlength="10">
+    </div>
+
+    <div class="keypad">
+      <button class="key" data-key="1">1</button>
+      <button class="key" data-key="2">2</button>
+      <button class="key" data-key="3">3</button>
+      <button class="key" data-key="4">4</button>
+      <button class="key" data-key="5">5</button>
+      <button class="key" data-key="6">6</button>
+      <button class="key" data-key="7">7</button>
+      <button class="key" data-key="8">8</button>
+      <button class="key" data-key="9">9</button>
+      <button class="key action" data-key="borrar">⌫</button>
+      <button class="key" data-key="0">0</button>
+      <button class="key action" data-key="limpiar">C</button>
+    </div>
+
+    <button class="btn-marcar" id="btn-marcar" disabled>MARCAR</button>
+
+    <div class="btn-group">
+      <button class="btn-consultar" id="btn-consultar" disabled>CONSULTAR</button>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="resultado" id="resultado">
+      <div class="icono" id="resultado-icono"></div>
+      <div class="mensaje" id="resultado-mensaje"></div>
+      <div class="detalle" id="resultado-detalle"></div>
+    </div>
+
+    <div class="consulta-panel" id="consulta-panel">
+      <div class="consulta-header">
+        <span class="consulta-titulo">Mis marcaciones de hoy</span>
+        <button class="consulta-cerrar" id="btn-cerrar-consulta">✕</button>
+      </div>
+      <div class="consulta-lista" id="consulta-lista"></div>
+      <div class="consulta-empty" id="consulta-empty">No tiene marcaciones registradas hoy</div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = window.location.origin + '/api/horarios';
+    const cedulaInput = document.getElementById('cedula');
+    const btnMarcar = document.getElementById('btn-marcar');
+    const btnConsultar = document.getElementById('btn-consultar');
+    const btnCerrarConsulta = document.getElementById('btn-cerrar-consulta');
+    const consultaPanel = document.getElementById('consulta-panel');
+    const consultaLista = document.getElementById('consulta-lista');
+    const consultaEmpty = document.getElementById('consulta-empty');
+    const loading = document.getElementById('loading');
+    const resultado = document.getElementById('resultado');
+    const resultadoIcono = document.getElementById('resultado-icono');
+    const resultadoMensaje = document.getElementById('resultado-mensaje');
+    const resultadoDetalle = document.getElementById('resultado-detalle');
+
+    let cedula = '';
+
+    // Teclado numérico
+    document.querySelectorAll('.key').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.key;
+        
+        if (key === 'borrar') {
+          cedula = cedula.slice(0, -1);
+        } else if (key === 'limpiar') {
+          cedula = '';
+        } else if (cedula.length < 10) {
+          cedula += key;
+        }
+        
+        cedulaInput.value = cedula || 'Ingrese su cédula';
+        btnMarcar.disabled = cedula.length !== 10;
+        btnConsultar.disabled = cedula.length !== 10;
+        
+        // Ocultar resultado y consulta anterior
+        resultado.className = 'resultado';
+        consultaPanel.classList.remove('visible');
+      });
+    });
+
+    // Botón marcar
+    btnMarcar.addEventListener('click', async () => {
+      if (cedula.length !== 10) return;
+
+      // Deshabilitar botón y mostrar loading
+      btnMarcar.disabled = true;
+      loading.classList.add('active');
+      resultado.className = 'resultado';
+
+      try {
+        const response = await fetch(`${API_URL}/marcaciones`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cedula }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Éxito
+          const tipo = data.tipo === 'entrada' ? 'ENTRADA' : 'SALIDA';
+          const hora = new Date(data.timestamp).toLocaleTimeString('es-EC', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            timeZone: 'America/Guayaquil'
+          });
+          
+          resultadoIcono.textContent = '✅';
+          resultadoMensaje.textContent = `${tipo} REGISTRADA`;
+          resultadoDetalle.textContent = `${data.empleado_nombre} - ${hora}`;
+          resultado.className = 'resultado exito';
+          
+          // Limpiar cédula después de 3 segundos
+          setTimeout(() => {
+            cedula = '';
+            cedulaInput.value = 'Ingrese su cédula';
+            btnMarcar.disabled = true;
+          }, 3000);
+        } else if (response.status === 409 && data.code === 'SHORT_INTERVAL') {
+          // Intervalo corto - pedir confirmación
+          if (confirm(data.error)) {
+            // Reenviar con confirmar: true
+            const retryResponse = await fetch(`${API_URL}/marcaciones`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ cedula, confirmar: true }),
+            });
+            
+            const retryData = await retryResponse.json();
+            
+            if (retryResponse.ok) {
+              const tipo = retryData.tipo === 'entrada' ? 'ENTRADA' : 'SALIDA';
+              const hora = new Date(retryData.timestamp).toLocaleTimeString('es-EC', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZone: 'America/Guayaquil'
+              });
+              
+              resultadoIcono.textContent = '✅';
+              resultadoMensaje.textContent = `${tipo} REGISTRADA`;
+              resultadoDetalle.textContent = `${retryData.empleado_nombre} - ${hora}`;
+              resultado.className = 'resultado exito';
+              
+              setTimeout(() => {
+                cedula = '';
+                cedulaInput.value = 'Ingrese su cédula';
+                btnMarcar.disabled = true;
+              }, 3000);
+            } else {
+              resultadoIcono.textContent = '❌';
+              resultadoMensaje.textContent = retryData.error || 'Error al registrar';
+              resultado.className = 'resultado error';
+            }
+          } else {
+            resultadoIcono.textContent = '⚠️';
+            resultadoMensaje.textContent = 'Marcación cancelada';
+            resultado.className = 'resultado error';
+          }
+        } else {
+          // Error
+          resultadoIcono.textContent = '❌';
+          resultadoMensaje.textContent = data.error || 'Error al registrar';
+          resultado.className = 'resultado error';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        resultadoIcono.textContent = '❌';
+        resultadoMensaje.textContent = 'Error de conexión';
+        resultado.className = 'resultado error';
+      } finally {
+        loading.classList.remove('active');
+        btnMarcar.disabled = cedula.length !== 10;
+      }
+    });
+
+    // Vibración háptica en teclas (si está disponible)
+    document.querySelectorAll('.key').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (navigator.vibrate) {
+          navigator.vibrate(50);
+        }
+      });
+    });
+
+    // Botón consultar
+    btnConsultar.addEventListener('click', async () => {
+      if (cedula.length !== 10) return;
+
+      loading.classList.add('active');
+      resultado.className = 'resultado';
+      consultaPanel.classList.remove('visible');
+
+      try {
+        const response = await fetch(`${API_URL}/marcaciones/hoy?cedula=${cedula}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          consultaLista.innerHTML = '';
+          
+          if (data.length === 0) {
+            consultaEmpty.classList.add('visible');
+            consultaLista.style.display = 'none';
+          } else {
+            consultaEmpty.classList.remove('visible');
+            consultaLista.style.display = 'block';
+            
+            data.forEach(m => {
+              const hora = new Date(m.timestamp).toLocaleTimeString('es-EC', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'America/Guayaquil'
+              });
+              
+              const item = document.createElement('div');
+              item.className = 'consulta-item';
+              item.innerHTML = `
+                <span class="consulta-tipo ${m.tipo}">${m.tipo === 'entrada' ? 'ENTRADA' : 'SALIDA'}</span>
+                <span class="consulta-hora">${hora}</span>
+              `;
+              consultaLista.appendChild(item);
+            });
+          }
+          
+          consultaPanel.classList.add('visible');
+        } else {
+          resultadoIcono.textContent = '❌';
+          resultadoMensaje.textContent = data.error || 'Error al consultar';
+          resultado.className = 'resultado error';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        resultadoIcono.textContent = '❌';
+        resultadoMensaje.textContent = 'Error de conexión';
+        resultado.className = 'resultado error';
+      } finally {
+        loading.classList.remove('active');
+      }
+    });
+
+    // Cerrar panel de consulta
+    btnCerrarConsulta.addEventListener('click', () => {
+      consultaPanel.classList.remove('visible');
+    });
+  </script>
+</body>
+</html>

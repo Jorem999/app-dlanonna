@@ -1,0 +1,17 @@
+{
+  "name": "@dlanonna/server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@dlanonna/core": "*",
+    "@dlanonna/horarios": "*",
+    "hono": "^4.4.0",
+    "@hono/node-server": "^1.11.0",
+    "dotenv": "^16.4.5"
+  }
+}
