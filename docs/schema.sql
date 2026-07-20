@@ -1,10 +1,10 @@
 -- ============================================================
--- ESQUEMA BD: Módulo Horarios — D'la Nonna
+-- ESQUEMA BD: D'la Nonna — Monorepo app-dlanonna
 -- Base de datos: dlanonna (PostgreSQL 16)
 -- Generado desde: BD real en producción (dump 2026-07-19)
 -- ============================================================
 -- Schemas usados:
---   core        → usuarios del sistema, auditoría
+--   core        → usuarios del sistema, accesos, auditoría
 --   horarios    → regímenes, empleados, marcaciones, pagos, cargos
 -- ============================================================
 
@@ -74,16 +74,34 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_changed ON core.audit_log(changed_at);
 
 -- ============================================================
 -- TABLA: core.usuario
--- Acceso al dashboard/admin. Empleado se autentica por cédula
--- en la pantalla de marcación.
+-- Usuarios internos del sistema (admin/manager/operador).
+-- Los empleados se autentican por cédula en marcación (no tienen
+-- registro aquí). Los clientes web tienen su propia tabla.
 -- ============================================================
 CREATE TABLE IF NOT EXISTS core.usuario (
     id              SERIAL PRIMARY KEY,
     username        VARCHAR(50) NOT NULL UNIQUE,
     password_hash   VARCHAR(255) NOT NULL,
-    rol             VARCHAR(20) NOT NULL DEFAULT 'admin' CHECK (rol IN ('admin', 'user')),
+    rol_base        VARCHAR(20) NOT NULL DEFAULT 'admin'
+                    CHECK (rol_base IN ('admin', 'manager', 'operador')),
     activo          BOOLEAN NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ============================================================
+-- TABLA: core.acceso_modulo
+-- Permisos modulares: qué puede hacer cada usuario en cada
+-- módulo. Los admin tienen acceso implícito a todo (no necesitan
+-- entradas aquí).
+-- Niveles: marcacion < lectura < gestion < admin
+-- Módulos: horarios, produccion, ventas, web
+-- ============================================================
+CREATE TABLE IF NOT EXISTS core.acceso_modulo (
+    usuario_id      INTEGER NOT NULL REFERENCES core.usuario(id) ON DELETE CASCADE,
+    modulo          VARCHAR(50) NOT NULL,
+    nivel           VARCHAR(20) NOT NULL
+                    CHECK (nivel IN ('marcacion', 'lectura', 'gestion', 'admin')),
+    PRIMARY KEY (usuario_id, modulo)
 );
 
 -- ============================================================

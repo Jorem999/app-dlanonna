@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import { authMiddleware } from '@dlanonna/core';
+import { authMiddleware, requireAcceso } from '@dlanonna/core';
 import { pool } from '@dlanonna/core';
 
 const app = new Hono();
 
-// Apply auth middleware to all routes
-app.use('*', authMiddleware);
+// Auth + nivel lectura mínimo para acceder al módulo horarios
+app.use('*', authMiddleware, requireAcceso('horarios', 'lectura'));
 
 // GET /empleados
 app.get('/', async (c) => {
@@ -34,7 +34,7 @@ app.get('/', async (c) => {
 });
 
 // POST /empleados
-app.post('/', async (c) => {
+app.post('/', requireAcceso('horarios', 'gestion'), async (c) => {
   try {
     const { cedula, nombre, telefono, cargo, fecha_ingreso, regimen_id } = await c.req.json();
 
@@ -99,7 +99,7 @@ app.get('/:id', async (c) => {
 });
 
 // PUT /empleados/:id
-app.put('/:id', async (c) => {
+app.put('/:id', requireAcceso('horarios', 'gestion'), async (c) => {
   try {
     const id = c.req.param('id');
     const { cedula, nombre, telefono, cargo, fecha_ingreso, regimen_id, activo } = await c.req.json();
@@ -163,7 +163,7 @@ app.put('/:id', async (c) => {
 });
 
 // DELETE /empleados/:id (soft delete)
-app.delete('/:id', async (c) => {
+app.delete('/:id', requireAcceso('horarios', 'gestion'), async (c) => {
   try {
     const id = c.req.param('id');
     const result = await pool.query(

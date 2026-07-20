@@ -28,7 +28,7 @@
 
 ### POST /api/auth/login
 
-Inicia sesión en el dashboard admin. Devuelve un JWT con expiración configurable.
+Inicia sesión en el dashboard admin. Devuelve un JWT con los accesos del usuario.
 
 **Request:**
 ```json
@@ -46,7 +46,13 @@ Inicia sesión en el dashboard admin. Devuelve un JWT con expiración configurab
   "usuario": {
     "id": 1,
     "username": "jorge",
-    "rol": "admin"
+    "rol_base": "admin",
+    "accesos": [
+      { "modulo": "horarios", "nivel": "admin" },
+      { "modulo": "produccion", "nivel": "admin" },
+      { "modulo": "ventas", "nivel": "admin" },
+      { "modulo": "web", "nivel": "admin" }
+    ]
   }
 }
 ```
@@ -60,12 +66,14 @@ Inicia sesión en el dashboard admin. Devuelve un JWT con expiración configurab
 ```
 
 > `expires_in` en segundos (ej: 28800 = 8h). No existe endpoint de logout — el cliente descarta el token al cerrar sesión.
+>
+> **Sistema de accesos:** Cada usuario tiene un `rol_base` (admin | manager | operador) y una lista de accesos modulares. Los admin tienen acceso implícito a todo. El frontend debe usar `usuario.accesos` para mostrar/ocultar menús y funcionalidades.
 
 ---
 
-## 2. Regímenes de horario (admin)
+## 2. Regímenes de horario (requiere auth + horarios:lectura)
 
-Todas requieren `Authorization: Bearer <token>`.
+Todas requieren `Authorization: Bearer <token>` y acceso al módulo horarios (nivel `lectura` o superior). Las operaciones de escritura (POST, PUT, DELETE) requieren nivel `gestion`.
 
 ### GET /api/horarios/regimenes
 
@@ -133,9 +141,9 @@ Mismos campos que POST. Solo se envían los campos a actualizar.
 
 ---
 
-## 3. Empleados (admin)
+## 3. Empleados (requiere auth + horarios:lectura)
 
-Todas requieren `Authorization: Bearer <token>`.
+Todas requieren `Authorization: Bearer <token>` y acceso `lectura` en horarios. POST, PUT, DELETE requieren `gestion`.
 
 ### GET /api/horarios/empleados
 
@@ -273,9 +281,9 @@ Requiere `Authorization: Bearer <token>`.
 
 ---
 
-## 6. Reportes (admin)
+## 6. Reportes (requiere auth + horarios:lectura)
 
-Requieren `Authorization: Bearer <token>`.
+Requieren `Authorization: Bearer <token>` y nivel `lectura` en horarios.
 
 ### GET /api/horarios/reportes/diario?fecha=2026-07-01
 
@@ -307,22 +315,22 @@ Mismo formato que diario pero con datos agrupados por empleado y fecha en el ran
 | Método | Ruta | Auth | MVP/V2 |
 |--------|------|------|--------|
 | POST | `/auth/login` | — | MVP |
-| GET | `/horarios/regimenes` | Admin | MVP |
-| POST | `/horarios/regimenes` | Admin | MVP |
-| GET | `/horarios/regimenes/:id` | Admin | MVP |
-| PUT | `/horarios/regimenes/:id` | Admin | MVP |
-| DELETE | `/horarios/regimenes/:id` | Admin | MVP |
-| GET | `/horarios/empleados` | Admin | MVP |
-| POST | `/horarios/empleados` | Admin | MVP |
-| GET | `/horarios/empleados/:id` | Admin | MVP |
-| PUT | `/horarios/empleados/:id` | Admin | MVP |
-| DELETE | `/horarios/empleados/:id` | Admin | MVP |
+| GET | `/horarios/regimenes` | horarios:lectura | MVP |
+| POST | `/horarios/regimenes` | horarios:gestion | MVP |
+| GET | `/horarios/regimenes/:id` | horarios:lectura | MVP |
+| PUT | `/horarios/regimenes/:id` | horarios:gestion | MVP |
+| DELETE | `/horarios/regimenes/:id` | horarios:gestion | MVP |
+| GET | `/horarios/empleados` | horarios:lectura | MVP |
+| POST | `/horarios/empleados` | horarios:gestion | MVP |
+| GET | `/horarios/empleados/:id` | horarios:lectura | MVP |
+| PUT | `/horarios/empleados/:id` | horarios:gestion | MVP |
+| DELETE | `/horarios/empleados/:id` | horarios:gestion | MVP |
 | POST | `/horarios/marcaciones` | — | MVP |
 | GET | `/horarios/marcaciones/hoy` | — | MVP |
 | GET | `/horarios/marcaciones` | — | MVP |
-| PUT | `/horarios/marcaciones/:id` | Admin | V2 |
-| GET | `/horarios/reportes/diario` | Admin | MVP |
-| GET | `/horarios/reportes/semanal` | Admin | MVP |
+| PUT | `/horarios/marcaciones/:id` | horarios:gestion | V2 |
+| GET | `/horarios/reportes/diario` | horarios:lectura | MVP |
+| GET | `/horarios/reportes/semanal` | horarios:lectura | MVP |
 
 ---
 

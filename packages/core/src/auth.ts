@@ -17,7 +17,7 @@ app.post('/login', async (c) => {
 
     // Find user
     const result = await pool.query(
-      'SELECT id, username, password_hash, rol FROM core.usuario WHERE username = $1 AND activo = true',
+      'SELECT id, username, password_hash, rol_base FROM core.usuario WHERE username = $1 AND activo = true',
       [username]
     );
 
@@ -33,9 +33,22 @@ app.post('/login', async (c) => {
       return c.json({ error: 'Credenciales inválidas', code: 'UNAUTHORIZED' }, 401);
     }
 
+    // Load module accesos
+    const accesosResult = await pool.query(
+      'SELECT modulo, nivel FROM core.acceso_modulo WHERE usuario_id = $1',
+      [user.id]
+    );
+
+    const accesos = accesosResult.rows;
+
     // Generate JWT
     const token = jwt.sign(
-      { userId: user.id, username: user.username, rol: user.rol },
+      {
+        userId: user.id,
+        username: user.username,
+        rol_base: user.rol_base,
+        accesos,
+      },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: parseInt(process.env.JWT_EXPIRES_IN || '28800') }
     );
@@ -46,7 +59,8 @@ app.post('/login', async (c) => {
       usuario: {
         id: user.id,
         username: user.username,
-        rol: user.rol,
+        rol_base: user.rol_base,
+        accesos,
       },
     });
   } catch (error) {

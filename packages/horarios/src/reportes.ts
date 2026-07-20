@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import { authMiddleware } from '@dlanonna/core';
+import { authMiddleware, requireAcceso } from '@dlanonna/core';
 import { pool } from '@dlanonna/core';
 
 const app = new Hono();
 
-// Apply auth middleware to all routes
-app.use('*', authMiddleware);
+// Auth + nivel lectura mínimo para acceder al módulo horarios
+app.use('*', authMiddleware, requireAcceso('horarios', 'lectura'));
 
 // GET /reportes/diario
 app.get('/diario', async (c) => {
