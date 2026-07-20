@@ -14,6 +14,9 @@ RUN npm ci
 
 # Copy all source code
 COPY tsconfig.base.json ./
+COPY packages/core/tsconfig.json packages/core/
+COPY packages/horarios/tsconfig.json packages/horarios/
+COPY apps/server/tsconfig.json apps/server/
 COPY packages/core/src packages/core/src
 COPY packages/horarios/src packages/horarios/src
 COPY packages/horarios/frontend packages/horarios/frontend
